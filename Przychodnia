@@ -1,0 +1,116 @@
+package lab03;
+
+import java.util.*;
+import java.awt.event.*;
+import javax.swing.*;
+import java.awt.*;
+import java.io.*;
+
+public class Przychodnia {
+	private JTextArea dane;
+	private JTextArea wyniki;
+	private ArrayList<KartaPacjenta> listaKart;
+	private JFrame ramka;
+
+	public static void main(String[] args) {
+		Przychodnia edytor = new Przychodnia();
+		edytor.doDziela();
+	}
+
+	public void doDziela() {
+		ramka = new JFrame("Dane pacjenta");
+		ramka.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		JPanel panelGlowny = new JPanel();
+		Font czcionkaDuza = new Font("sanserif", Font.BOLD, 24);
+		dane = new JTextArea(6, 20);
+		dane.setLineWrap(true);
+		dane.setWrapStyleWord(true);
+		dane.setFont(czcionkaDuza);
+
+		JScrollPane przewijaniePyt = new JScrollPane(dane);
+		przewijaniePyt.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		przewijaniePyt.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
+		wyniki = new JTextArea(6, 20);
+		wyniki.setLineWrap(true);
+		wyniki.setWrapStyleWord(true);
+		wyniki.setFont(czcionkaDuza);
+
+		JScrollPane przewijanieOdp = new JScrollPane(wyniki);
+		przewijanieOdp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		przewijanieOdp.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
+		JButton przyciskNastepna = new JButton("Nastepna karta");
+
+		listaKart = new ArrayList<KartaPacjenta>();
+
+		JLabel etykietaPyt = new JLabel("Dane pacjenta: ");
+		JLabel etykietaOdp = new JLabel("Wyniki badan: ");
+
+		panelGlowny.add(etykietaPyt);
+		panelGlowny.add(przewijaniePyt);
+		panelGlowny.add(etykietaOdp);
+		panelGlowny.add(przewijanieOdp);
+		panelGlowny.add(przyciskNastepna);
+		przyciskNastepna.addActionListener(new NastepnaKartaListener());
+		JMenuBar menu = new JMenuBar();
+		JMenu menuPlik = new JMenu("Plik");
+		JMenuItem opcjaNowa = new JMenuItem("Nowy");
+		JMenuItem opcjaZapisz = new JMenuItem("Zapisz");
+		opcjaNowa.addActionListener(new NowyMenuListener());
+
+		opcjaZapisz.addActionListener(new ZapiszMenuListener());
+		menuPlik.add(opcjaNowa);
+		menuPlik.add(opcjaZapisz);
+		menu.add(menuPlik);
+		ramka.setJMenuBar(menu);
+		ramka.getContentPane().add(BorderLayout.CENTER, panelGlowny);
+		ramka.setSize(500, 600);
+		ramka.setVisible(true);
+	}
+
+	public class NastepnaKartaListener implements ActionListener {
+		public void actionPerformed(ActionEvent zd) {
+			KartaPacjenta karta = new KartaPacjenta(dane.getText(), wyniki.getText());
+			listaKart.add(karta);
+			czyscKarte();
+		}
+	}
+
+	public class ZapiszMenuListener implements ActionListener {
+		public void actionPerformed(ActionEvent zd) {
+			KartaPacjenta karta = new KartaPacjenta(dane.getText(), wyniki.getText());
+			listaKart.add(karta);
+			JFileChooser plikDanych = new JFileChooser();
+			plikDanych.showSaveDialog(ramka);
+			zapiszPlik(plikDanych.getSelectedFile());
+		}
+	}
+
+	public class NowyMenuListener implements ActionListener {
+		public void actionPerformed(ActionEvent zd) {
+			listaKart.clear();
+			czyscKarte();
+		}
+	}
+
+	private void czyscKarte() {
+		dane.setText("");
+		wyniki.setText("");
+		dane.requestFocus();
+	}
+
+	private void zapiszPlik(File plik) {
+		try {
+			BufferedWriter pisarz = new BufferedWriter(new FileWriter(plik));
+			for (KartaPacjenta karta : listaKart) {
+				pisarz.write(karta.getDane() + "/");
+				pisarz.write(karta.getWyniki() + "\n");
+			}
+			pisarz.close();
+		} catch (IOException e) {
+			System.out.println("Nie mozna zapisac pliku kart!");
+			e.printStackTrace();
+		}
+	}
+}
