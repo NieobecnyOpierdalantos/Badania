@@ -3,11 +3,6 @@ package lab03;
 import java.util.*;
 import java.awt.event.*;
 import javax.swing.*;
-
-import lab03.Przychodnia.NastepnaKartaListener;
-import lab03.Przychodnia.NowyMenuListener;
-import lab03.Przychodnia.ZapiszMenuListener;
-
 import java.awt.*;
 import java.io.*;
 
