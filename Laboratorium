@@ -6,19 +6,19 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.*;
 
-public class Laboratorium{
+public class Laboratorium {
 	private JTextArea danePacjentow;
 	private JTextArea wyniki;
-	private ArrayList<Laboratorium> listaKart;
-	private Laboratorium biezacaKarta;
+	private ArrayList<KartaPacjenta> listaKart;
+	private KartaPacjenta biezacaKarta;
 	private int indeksBiezacejKarty;
 	private JFrame ramka;
 	private JButton przyciskNastepnaKarta;
 	private boolean czyPrezentowaneWyniki;
 
 	public static void main(String[] args) {
-		Laboratorium gra = new Laboratorium();
-		gra.doDziela();
+		Laboratorium badania = new Laboratorium();
+		badania.doDziela();
 	}
 
 	public void doDziela() {
@@ -26,12 +26,12 @@ public class Laboratorium{
 		ramka.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		JPanel panelGlowny = new JPanel();
 		Font czcionkaDuza = new Font("sanserif", Font.BOLD, 24);
-		
+
 		danePacjentow = new JTextArea(10, 20);
 		danePacjentow.setFont(czcionkaDuza);
 		danePacjentow.setLineWrap(true);
 		danePacjentow.setEditable(false);
-		
+
 		JScrollPane przewijanieP = new JScrollPane(danePacjentow);
 		przewijanieP.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		przewijanieP.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -39,7 +39,7 @@ public class Laboratorium{
 		panelGlowny.add(przewijanieP);
 		panelGlowny.add(przyciskNastepnaKarta);
 		przyciskNastepnaKarta.addActionListener(new NastepnaKartaListener());
-		
+
 		JMenuBar pasekMenu = new JMenuBar();
 		JMenu menuPlik = new JMenu("Plik");
 		JMenuItem opcjaOtworz = new JMenuItem("Otwórz zbiór kart");
@@ -54,8 +54,14 @@ public class Laboratorium{
 
 	public class NastepnaKartaListener implements ActionListener {
 		public void actionPerformed(ActionEvent zd) {
+			String s = null;
+
 			if (czyPrezentowaneWyniki) {
 // pokaz wyniki
+				/*for (String p : biezacaKarta.getWyniki()) {
+					s += p + "\n";
+				}
+				danePacjentow.setText(s);*/
 				danePacjentow.setText(biezacaKarta.getWyniki());
 				przyciskNastepnaKarta.setText("Nastepna karta");
 				czyPrezentowaneWyniki = false;
@@ -81,7 +87,7 @@ public class Laboratorium{
 	}
 
 	private void wczytajPlik(File file) {
-		listaKart = new ArrayList<Laboratorium>();
+		listaKart = new ArrayList<KartaPacjenta>();
 		try {
 			BufferedReader czytelnik = new BufferedReader(new FileReader(file));
 			String wiersz = null;
@@ -99,7 +105,7 @@ public class Laboratorium{
 
 	private void tworzKarte(String wierszDanych) {
 		String[] wyniki = wierszDanych.split("/");
-		Laboratorium card = new Laboratorium();
+		KartaPacjenta card = new KartaPacjenta(wierszDanych, wierszDanych);
 		listaKart.add(card);
 		System.out.println("Utworzono karte");
 	}
@@ -107,6 +113,11 @@ public class Laboratorium{
 	private void pokazNastepnaKarte() {
 		biezacaKarta = listaKart.get(indeksBiezacejKarty);
 		indeksBiezacejKarty++;
+		/*String s = null;
+		for (String p : biezacaKarta.getDane()) {
+			s += p + "\n";
+		}
+		danePacjentow.setText(s);*/
 		danePacjentow.setText(biezacaKarta.getDane());
 		przyciskNastepnaKarta.setText("Pokaz wyniki");
 		czyPrezentowaneWyniki = true;
