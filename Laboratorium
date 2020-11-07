@@ -99,7 +99,7 @@ public class Laboratorium{
 
 	private void tworzKarte(String wierszDanych) {
 		String[] wyniki = wierszDanych.split("/");
-		Laboratorium card = new Laboratorium(/*wyniki[0], wyniki[1]*/);
+		Laboratorium card = new Laboratorium();
 		listaKart.add(card);
 		System.out.println("Utworzono karte");
 	}
