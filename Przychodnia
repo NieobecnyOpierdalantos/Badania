@@ -11,6 +11,10 @@ public class Przychodnia {
 	private JTextArea wyniki;
 	private ArrayList<KartaPacjenta> listaKart;
 	private JFrame ramka;
+	private KartaPacjenta biezacaKarta;
+	private int indeksBiezacejKarty;
+	private JButton przyciskNastepna;
+	private boolean czyPrezentowaneWyniki;
 
 	public static void main(String[] args) {
 		Przychodnia edytor = new Przychodnia();
@@ -22,46 +26,53 @@ public class Przychodnia {
 		ramka.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		JPanel panelGlowny = new JPanel();
 		Font czcionkaDuza = new Font("sanserif", Font.BOLD, 24);
+
 		dane = new JTextArea(6, 20);
 		dane.setLineWrap(true);
 		dane.setWrapStyleWord(true);
 		dane.setFont(czcionkaDuza);
 
-		JScrollPane przewijaniePyt = new JScrollPane(dane);
-		przewijaniePyt.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		przewijaniePyt.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		JScrollPane przewijanieD = new JScrollPane(dane);
+		przewijanieD.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		przewijanieD.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
 		wyniki = new JTextArea(6, 20);
-		wyniki.setLineWrap(true);
-		wyniki.setWrapStyleWord(true);
 		wyniki.setFont(czcionkaDuza);
+		wyniki.setLineWrap(true);
+		wyniki.setEditable(false);
 
-		JScrollPane przewijanieOdp = new JScrollPane(wyniki);
-		przewijanieOdp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		przewijanieOdp.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		JScrollPane przewijanieW = new JScrollPane(wyniki);
+		przewijanieW.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		przewijanieW.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
-		JButton przyciskNastepna = new JButton("Nastepna karta");
+		panelGlowny.add(przewijanieD);
+
+		przyciskNastepna = new JButton("Nastepna karta");
 
 		listaKart = new ArrayList<KartaPacjenta>();
 
-		JLabel etykietaPyt = new JLabel("Dane pacjenta: ");
-		JLabel etykietaOdp = new JLabel("Wyniki badan: ");
+		JLabel etykietaD = new JLabel("Dane pacjenta: ");
+		JLabel etykietaW = new JLabel("Wyniki badan: ");
 
-		panelGlowny.add(etykietaPyt);
-		panelGlowny.add(przewijaniePyt);
-		panelGlowny.add(etykietaOdp);
-		panelGlowny.add(przewijanieOdp);
+		panelGlowny.add(etykietaD);
+		panelGlowny.add(przewijanieD);
+		panelGlowny.add(etykietaW);
+		panelGlowny.add(przewijanieW);
 		panelGlowny.add(przyciskNastepna);
 		przyciskNastepna.addActionListener(new NastepnaKartaListener());
+
 		JMenuBar menu = new JMenuBar();
 		JMenu menuPlik = new JMenu("Plik");
 		JMenuItem opcjaNowa = new JMenuItem("Nowy");
 		JMenuItem opcjaZapisz = new JMenuItem("Zapisz");
-		opcjaNowa.addActionListener(new NowyMenuListener());
+		JMenuItem opcjaOtworz = new JMenuItem("Otwórz zbiór kart");
 
+		opcjaNowa.addActionListener(new NowyMenuListener());
 		opcjaZapisz.addActionListener(new ZapiszMenuListener());
 		menuPlik.add(opcjaNowa);
 		menuPlik.add(opcjaZapisz);
+		opcjaOtworz.addActionListener(new OtworzMenuListener());
+		menuPlik.add(opcjaOtworz);
 		menu.add(menuPlik);
 		ramka.setJMenuBar(menu);
 		ramka.getContentPane().add(BorderLayout.CENTER, panelGlowny);
@@ -71,10 +82,68 @@ public class Przychodnia {
 
 	public class NastepnaKartaListener implements ActionListener {
 		public void actionPerformed(ActionEvent zd) {
+
 			KartaPacjenta karta = new KartaPacjenta(dane.getText(), wyniki.getText());
 			listaKart.add(karta);
 			czyscKarte();
+
+			if (czyPrezentowaneWyniki) {
+				// pokaz wyniki
+				wyniki.setText(biezacaKarta.getWyniki());
+				przyciskNastepna.setText("Nastepna karta");
+				czyPrezentowaneWyniki = false;
+			} else {
+				// pokaz nastepną kartę
+				if (indeksBiezacejKarty < listaKart.size()) {
+					pokazNastepnaKarte();
+				} else {
+					// nie ma wiecej kart
+					wyniki.setText("To byla ostatnia karta");
+					przyciskNastepna.setEnabled(false);
+				}
+			}
 		}
+	}
+
+	public class OtworzMenuListener implements ActionListener {
+		public void actionPerformed(ActionEvent ev) {
+			JFileChooser dialogFile = new JFileChooser();
+			dialogFile.showOpenDialog(ramka);
+			wczytajPlik(dialogFile.getSelectedFile());
+		}
+	}
+
+	private void wczytajPlik(File file) {
+		listaKart = new ArrayList<KartaPacjenta>();
+		try {
+			BufferedReader czytelnik = new BufferedReader(new FileReader(file));
+			String wiersz = null;
+			while ((wiersz = czytelnik.readLine()) != null) {
+				tworzKarte(wiersz);
+			}
+			czytelnik.close();
+		} catch (Exception e) {
+			System.out.println("Nie mozna odczytac pliku z kartami!");
+			e.printStackTrace();
+		}
+
+		pokazNastepnaKarte();
+	}
+
+	private void tworzKarte(String wierszDanych) {
+		// String[] wyniki = wierszDanych.split("/");
+		KartaPacjenta card = new KartaPacjenta(wierszDanych, wierszDanych);
+		listaKart.add(card);
+		System.out.println("Utworzono karte");
+	}
+
+	private void pokazNastepnaKarte() {
+		biezacaKarta = listaKart.get(indeksBiezacejKarty);
+		indeksBiezacejKarty++;
+
+		wyniki.setText(biezacaKarta.getWyniki());
+		// przyciskNastepna.setText("Pokaz wyniki");
+		czyPrezentowaneWyniki = true;
 	}
 
 	public class ZapiszMenuListener implements ActionListener {
