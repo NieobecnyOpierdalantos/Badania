@@ -58,10 +58,6 @@ public class Laboratorium {
 
 			if (czyPrezentowaneWyniki) {
 // pokaz wyniki
-				/*for (String p : biezacaKarta.getWyniki()) {
-					s += p + "\n";
-				}
-				danePacjentow.setText(s);*/
 				danePacjentow.setText(biezacaKarta.getWyniki());
 				przyciskNastepnaKarta.setText("Nastepna karta");
 				czyPrezentowaneWyniki = false;
@@ -113,11 +109,6 @@ public class Laboratorium {
 	private void pokazNastepnaKarte() {
 		biezacaKarta = listaKart.get(indeksBiezacejKarty);
 		indeksBiezacejKarty++;
-		/*String s = null;
-		for (String p : biezacaKarta.getDane()) {
-			s += p + "\n";
-		}
-		danePacjentow.setText(s);*/
 		danePacjentow.setText(biezacaKarta.getDane());
 		przyciskNastepnaKarta.setText("Pokaz wyniki");
 		czyPrezentowaneWyniki = true;
