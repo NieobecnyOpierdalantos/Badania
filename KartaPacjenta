@@ -1,7 +1,10 @@
 package lab03;
 
-public class KartaPacjenta {
+import java.io.*;
 
+public class KartaPacjenta implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 	String badania;
 	String wynikiBadan;
 
