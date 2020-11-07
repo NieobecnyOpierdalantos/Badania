@@ -1,30 +1,22 @@
 package lab03;
 
-import java.util.ArrayList;
-
 public class KartaPacjenta {
-	// dane ze skierowania
-	String identyfikator;
-	String dataSkierowania;
-	ArrayList<String> badania = new ArrayList<String>();
-	// dane próbek
-	String dataPobrania;
-	String nazwaCzynnika;
-	// dane wyników
-	String dataWykonania;
-	ArrayList<String> wynikiBadan = new ArrayList<String>();
-	String wykonawcaBadania;
 
-	public void danePacjenta(String identyfikator, String dataSkierowania) {
-		this.identyfikator = identyfikator;
-		this.dataSkierowania = dataSkierowania;
+	String badania;
+	String wynikiBadan;
+
+	public KartaPacjenta(String dane, String wyniki) {
+
+		dane = badania;
+
+		wyniki = wynikiBadan;
 	}
 
 	public String getDane() {
-		return identyfikator;
+		return badania;
 	}
 
-	public ArrayList<String> getWyniki() {
+	public String getWyniki() {
 		return wynikiBadan;
 	}
 }
