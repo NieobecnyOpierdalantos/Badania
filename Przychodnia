@@ -131,7 +131,6 @@ public class Przychodnia {
 	}
 
 	private void tworzKarte(String wierszDanych) {
-		// String[] wyniki = wierszDanych.split("/");
 		KartaPacjenta card = new KartaPacjenta(wierszDanych, wierszDanych);
 		listaKart.add(card);
 		System.out.println("Utworzono karte");
@@ -142,7 +141,6 @@ public class Przychodnia {
 		indeksBiezacejKarty++;
 
 		wyniki.setText(biezacaKarta.getWyniki());
-		// przyciskNastepna.setText("Pokaz wyniki");
 		czyPrezentowaneWyniki = true;
 	}
 
