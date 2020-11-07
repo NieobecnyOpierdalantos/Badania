@@ -1,0 +1,114 @@
+package lab03;
+
+import java.util.*;
+import java.awt.event.*;
+import javax.swing.*;
+import java.awt.*;
+import java.io.*;
+
+public class Laboratorium{
+	private JTextArea danePacjentow;
+	private JTextArea wyniki;
+	private ArrayList<Laboratorium> listaKart;
+	private Laboratorium biezacaKarta;
+	private int indeksBiezacejKarty;
+	private JFrame ramka;
+	private JButton przyciskNastepnaKarta;
+	private boolean czyPrezentowaneWyniki;
+
+	public static void main(String[] args) {
+		Laboratorium gra = new Laboratorium();
+		gra.doDziela();
+	}
+
+	public void doDziela() {
+		ramka = new JFrame("Edytor karty pacjenta");
+		ramka.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		JPanel panelGlowny = new JPanel();
+		Font czcionkaDuza = new Font("sanserif", Font.BOLD, 24);
+		
+		danePacjentow = new JTextArea(10, 20);
+		danePacjentow.setFont(czcionkaDuza);
+		danePacjentow.setLineWrap(true);
+		danePacjentow.setEditable(false);
+		
+		JScrollPane przewijanieP = new JScrollPane(danePacjentow);
+		przewijanieP.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		przewijanieP.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		przyciskNastepnaKarta = new JButton("Pokaz karte");
+		panelGlowny.add(przewijanieP);
+		panelGlowny.add(przyciskNastepnaKarta);
+		przyciskNastepnaKarta.addActionListener(new NastepnaKartaListener());
+		
+		JMenuBar pasekMenu = new JMenuBar();
+		JMenu menuPlik = new JMenu("Plik");
+		JMenuItem opcjaOtworz = new JMenuItem("Otwórz zbiór kart");
+		opcjaOtworz.addActionListener(new OtworzMenuListener());
+		menuPlik.add(opcjaOtworz);
+		pasekMenu.add(menuPlik);
+		ramka.setJMenuBar(pasekMenu);
+		ramka.getContentPane().add(BorderLayout.CENTER, panelGlowny);
+		ramka.setSize(640, 500);
+		ramka.setVisible(true);
+	}
+
+	public class NastepnaKartaListener implements ActionListener {
+		public void actionPerformed(ActionEvent zd) {
+			if (czyPrezentowaneWyniki) {
+// pokaz wyniki
+				danePacjentow.setText(biezacaKarta.getWyniki());
+				przyciskNastepnaKarta.setText("Nastepna karta");
+				czyPrezentowaneWyniki = false;
+			} else {
+// pokaz nastepną kartę
+				if (indeksBiezacejKarty < listaKart.size()) {
+					pokazNastepnaKarte();
+				} else {
+// nie ma wiecej kart
+					danePacjentow.setText("To byla ostatnia karta");
+					przyciskNastepnaKarta.setEnabled(false);
+				}
+			}
+		}
+	}
+
+	public class OtworzMenuListener implements ActionListener {
+		public void actionPerformed(ActionEvent ev) {
+			JFileChooser dialogFile = new JFileChooser();
+			dialogFile.showOpenDialog(ramka);
+			wczytajPlik(dialogFile.getSelectedFile());
+		}
+	}
+
+	private void wczytajPlik(File file) {
+		listaKart = new ArrayList<Laboratorium>();
+		try {
+			BufferedReader czytelnik = new BufferedReader(new FileReader(file));
+			String wiersz = null;
+			while ((wiersz = czytelnik.readLine()) != null) {
+				tworzKarte(wiersz);
+			}
+			czytelnik.close();
+		} catch (Exception e) {
+			System.out.println("Nie mozna odczytac pliku z kartami!");
+			e.printStackTrace();
+		}
+
+		pokazNastepnaKarte();
+	}
+
+	private void tworzKarte(String wierszDanych) {
+		String[] wyniki = wierszDanych.split("/");
+		Laboratorium card = new Laboratorium(/*wyniki[0], wyniki[1]*/);
+		listaKart.add(card);
+		System.out.println("Utworzono karte");
+	}
+
+	private void pokazNastepnaKarte() {
+		biezacaKarta = listaKart.get(indeksBiezacejKarty);
+		indeksBiezacejKarty++;
+		danePacjentow.setText(biezacaKarta.getDane());
+		przyciskNastepnaKarta.setText("Pokaz wyniki");
+		czyPrezentowaneWyniki = true;
+	}
+}
