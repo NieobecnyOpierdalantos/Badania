@@ -7,9 +7,9 @@ public class KartaPacjenta {
 
 	public KartaPacjenta(String dane, String wyniki) {
 
-		dane = badania;
+		badania = dane;
 
-		wyniki = wynikiBadan;
+		wynikiBadan = wyniki;
 	}
 
 	public String getDane() {
